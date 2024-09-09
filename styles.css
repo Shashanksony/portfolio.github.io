@@ -384,7 +384,7 @@ body {
 
 @media (max-width: 767px) {
     .nav-links, .social-icons {
-        display: none;
+        display: block;
     }
 
     .hero-content h1 {
