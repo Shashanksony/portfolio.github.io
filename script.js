@@ -16,45 +16,56 @@ document.addEventListener('DOMContentLoaded', function() {
       "Transforming data into insights."
   ];
   
-  // Initialize typewriter effect
+  // Enhanced Typewriter Effect
   let currentTextIndex = 0;
   let charIndex = 0;
   let isDeleting = false;
-  let typingSpeed = 100;
+  let typingSpeed = 50; // Faster initial typing speed
+  let deletingSpeed = 30; // Faster deleting speed
+  let pauseTime = 1500; // Pause at end of word
+  let startDelay = 1000; // Initial delay before starting
   
   function typeWriter() {
       const currentText = typewriterTexts[currentTextIndex];
       
+      // Calculate typing speed with random variation
+      const randomSpeed = Math.random() * 20 - 10; // Random variation between -10 and +10
+      
       if (isDeleting) {
-          // Deleting text
+          // Deleting text with smooth effect
           typewriterElement.textContent = currentText.substring(0, charIndex - 1);
           charIndex--;
-          typingSpeed = 50; // Faster when deleting
+          typingSpeed = deletingSpeed + randomSpeed;
       } else {
-          // Typing text
+          // Typing text with smooth effect
           typewriterElement.textContent = currentText.substring(0, charIndex + 1);
           charIndex++;
-          typingSpeed = 100; // Normal typing speed
+          typingSpeed = 50 + randomSpeed; // Base typing speed with variation
       }
+      
+      // Add cursor effect
+      typewriterElement.classList.add('typing');
       
       // Check if word is complete
       if (!isDeleting && charIndex === currentText.length) {
           // Pause at end of word
           isDeleting = true;
-          typingSpeed = 1500; // Pause before deleting
+          typingSpeed = pauseTime;
+          typewriterElement.classList.remove('typing');
       } else if (isDeleting && charIndex === 0) {
           // Move to next word
           isDeleting = false;
           currentTextIndex = (currentTextIndex + 1) % typewriterTexts.length;
           typingSpeed = 500; // Pause before typing new word
+          typewriterElement.classList.remove('typing');
       }
       
       setTimeout(typeWriter, typingSpeed);
   }
   
-  // Start the typewriter effect
+  // Start the typewriter effect with initial delay
   if (typewriterElement) {
-      setTimeout(typeWriter, 1000); // Initial delay before starting
+      setTimeout(typeWriter, startDelay);
   }
   
   // Scroll event handler for header animation
@@ -89,24 +100,26 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Mobile menu toggle
   if (hamburger) {
-      hamburger.addEventListener('click', function(e) {
-          e.stopPropagation();
-          navLinks.classList.toggle('active');
-          socialIcons.classList.toggle('active');
-          this.classList.toggle('active');
-      });
+    hamburger.addEventListener('click', function(e) {
+      e.stopPropagation();
+      navLinks.classList.toggle('active');
+      socialIcons.classList.toggle('active');
+      this.classList.toggle('active');
+    });
   }
   
   // Close mobile menu when clicking outside
   document.addEventListener('click', function(event) {
-      if (hamburger && navLinks.classList.contains('active')) {
-          const isClickInsideNav = navLinks.contains(event.target) || hamburger.contains(event.target);
-          if (!isClickInsideNav) {
-              navLinks.classList.remove('active');
-              socialIcons.classList.remove('active');
-              hamburger.classList.remove('active');
-          }
+    if (hamburger && navLinks.classList.contains('active')) {
+      const isClickInsideNav = navLinks.contains(event.target) || 
+                             socialIcons.contains(event.target) || 
+                             hamburger.contains(event.target);
+      if (!isClickInsideNav) {
+        navLinks.classList.remove('active');
+        socialIcons.classList.remove('active');
+        hamburger.classList.remove('active');
       }
+    }
   });
   
   // Smooth scroll for navigation links
@@ -236,4 +249,34 @@ document.addEventListener('DOMContentLoaded', function() {
           if (hamburger) hamburger.classList.remove('active');
       }
   });
+});
+
+// Loading Animation
+document.addEventListener('DOMContentLoaded', () => {
+    const loadingOverlay = document.querySelector('.loading-overlay');
+    
+    // Hide loading overlay after page loads
+    window.addEventListener('load', () => {
+        setTimeout(() => {
+            loadingOverlay.classList.add('hidden');
+        }, 1000); // Show loading for at least 1 second
+    });
+});
+
+// Smooth scroll for navigation links
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+            target.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+            // Close menu after clicking a link
+            document.querySelector('.nav-links').classList.remove('active');
+            document.querySelector('.social-icons').classList.remove('active');
+            document.querySelector('.hamburger').classList.remove('active');
+        }
+    });
 });
